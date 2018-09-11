@@ -34,10 +34,15 @@ router.get('/:id', (req, res, next) => {
   const { id } = req.params;
 
   knex
+    .first('id', 'title', 'content')
     .from('notes')
     .where('id', `${id}`)
-    .then(results => {
-      res.status(200).json(results[0]);
+    .then(result => {
+      if (result) {
+        res.status(200).json(result);
+      } else {
+        next();
+      }
     })
     .catch(err => {
       next(err);
@@ -70,7 +75,11 @@ router.put('/:id', (req, res, next) => {
     .where('id', `${id}`)
     .update(updateObj)
     .then(results => {
-      res.status(200).json(results);
+      if (results) {
+        res.status(200).json(results);
+      } else {
+        next();
+      }
     })
     .catch(err => {
       next(err);
@@ -90,13 +99,14 @@ router.post('/', (req, res, next) => {
   }
 
   knex
-    .from('notes')
     .insert(newItem)
+    .into('notes')
     .returning(['id', 'title', 'content'])
-    .then(result => {
+    .then(results => {
+      const result = results[0];
       if (result) {
         res
-          .location()
+          .location(`${req.originalUrl}/${result.id}`)
           .status(201)
           .json(result);
       }
