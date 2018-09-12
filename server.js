@@ -6,6 +6,7 @@ const cors = require('cors');
 
 const { PORT } = require('./config');
 
+const foldersRouter = require('./routes/folders');
 const notesRouter = require('./routes/notes');
 
 // Create an Express application
@@ -22,6 +23,9 @@ app.use(cors());
 
 // Parse request body
 app.use(express.json());
+
+// Mount router on "/folders"
+app.use('/api/folders', foldersRouter);
 
 // Mount router on "/api"
 app.use('/api/notes', notesRouter);
@@ -45,8 +49,10 @@ app.use((err, req, res, next) => {
 });
 
 // Listen for incoming connections
-app.listen(PORT, function () {
-  console.info(`Server listening on ${this.address().port}`);
-}).on('error', err => {
-  console.error(err);
-});
+app
+  .listen(PORT, function() {
+    console.info(`Server listening on ${this.address().port}`);
+  })
+  .on('error', err => {
+    console.error(err);
+  });
