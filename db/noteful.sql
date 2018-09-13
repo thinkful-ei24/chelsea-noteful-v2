@@ -31,7 +31,8 @@ CREATE TABLE notes
 CREATE TABLE tags
 (
 	id serial PRIMARY KEY,
-	name text NOT NULL UNIQUE
+	name text NOT NULL
+	--UNIQUE
 );
 
 -- create notes_tag junction table 
