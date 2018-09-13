@@ -91,7 +91,7 @@ router.put('/:id', (req, res, next) => {
     .returning(['id', 'name'])
     .then(([result]) => {
       if (result) {
-        res.status(200).json(result);
+        res.json(result);
       } else {
         next();
       }
