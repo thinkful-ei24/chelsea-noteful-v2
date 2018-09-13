@@ -50,6 +50,9 @@ ALTER SEQUENCE folders_id_seq RESTART WITH 100;
 -- starting notes ID sequence w 1000
 ALTER SEQUENCE notes_id_seq restart with 1000;
 
+-- starting tags ID sequence w 100
+ALTER SEQUENCE tags_id_seq restart with 100;
+
 
 --insert data into tags
 INSERT INTO tags
