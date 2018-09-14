@@ -24,7 +24,7 @@ CREATE TABLE notes
 	title text NOT NULL,
 	content text,
 	created timestamp DEFAULT now(),
-	folder_id int REFERENCES folders(id) ON DELETE SET NULL
+	folder_id int REFERENCES folders(id) ON DELETE SET NULL --foreign key
 );
 
 -- create tags table 
