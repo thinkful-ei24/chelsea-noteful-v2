@@ -56,7 +56,15 @@ router.get('/', (req, res, next) => {
 // // Get a single item
 router.get('/:id', (req, res, next) => {
   const { id } = req.params;
+  console.log(id);
   // const { folderId } = req.body;
+
+  //validate id can't be anything other than numbers
+  // if (typeof id !== 'number') {
+  //   const err = new Error('Must be a valid id');
+  //   err.status = 404;
+  //   return next(err);
+  // }
 
   knex
     .select(
@@ -73,14 +81,14 @@ router.get('/:id', (req, res, next) => {
     .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
     .where('notes.id', id)
     .then(result => {
+      console.log(result.length);
       if (result) {
         const hydrated = hydrateNotes(result)[0];
         res.status(200).json(hydrated);
-      } else {
-        next();
       }
     })
     .catch(err => {
+      console.log('made it here');
       next(err);
     });
 });
@@ -138,7 +146,7 @@ router.put('/:id', (req, res, next) => {
         .where('notes.id', noteId);
     })
     .then(result => {
-      if (result) {
+      if (result.length === 1) {
         //hydrate results
         const [hydrated] = hydrateNotes(result);
         res.json(hydrated);
@@ -153,12 +161,12 @@ router.put('/:id', (req, res, next) => {
 
 // // Post (insert) an item
 router.post('/', (req, res, next) => {
-  const { title, content, folderId, tags } = req.body;
-
+  const { title, content, folderId, tags = [] } = req.body;
+  console.log('HERE');
+  console.log(folderId);
   const newItem = {
     title: title,
-    content: content,
-    folder_id: folderId
+    content: content
   };
 
   let noteId;
@@ -178,6 +186,7 @@ router.post('/', (req, res, next) => {
     .then(([id]) => {
       // Insert related tags into notes_tags table
       noteId = id;
+
       const tagsInsert = tags.map(tagId => ({
         note_id: noteId,
         tag_id: tagId
