@@ -108,7 +108,7 @@ describe('Noteful API', function() {
     });
   });
 
-  describe.only('GET /api/notes/:id', function() {
+  describe('GET /api/notes/:id', function() {
     it('should return correct note when given an id', function() {
       return chai
         .request(app)
@@ -127,7 +127,7 @@ describe('Noteful API', function() {
     it('should respond with a 404 for an invalid id', function() {
       return chai
         .request(app)
-        .get('/api/notes/asdfasdfawe')
+        .get('/api/notes/1002321')
         .then(function(res) {
           expect(res).to.have.status(404);
         });
@@ -135,7 +135,7 @@ describe('Noteful API', function() {
   });
 
   describe('POST /api/notes', function() {
-    it.only('should create and return a new item when provided valid data', function() {
+    it('should create and return a new item when provided valid data', function() {
       const newNote = {
         title: 'My newest note',
         content: 'Something really special here',
@@ -165,20 +165,69 @@ describe('Noteful API', function() {
         .post('/api/notes')
         .send(newNote)
         .then(function(res) {
-          expect(res).to.throw(Error);
+          expect(res).to.have.status(400);
         });
     });
   });
 
-  describe.skip('PUT /api/notes/:id', function() {
-    it('should update the note', function() {});
+  describe('PUT /api/notes/:id', function() {
+    it('should update the note', function() {
+      const updateData = {
+        title: 'Changed title',
+        content: 'updated all the content!'
+      };
 
-    it('should respond with a 404 for an invalid id', function() {});
+      return chai
+        .request(app)
+        .get('/api/notes')
+        .then(function(res) {
+          updateData.id = res.body[0].id;
 
-    it('should return an error when missing "title" field', function() {});
+          return chai
+            .request(app)
+            .put(`/api/notes/${updateData.id}`)
+            .send(updateData);
+        })
+        .then(function(res) {
+          expect(res).to.have.status(204);
+        });
+    });
+
+    it('should respond with a 404 for an invalid id', function() {
+      return chai
+        .request(app)
+        .get('/api/notes/1002321')
+        .then(function(res) {
+          expect(res).to.have.status(404);
+        });
+    });
+
+    it('should return an error when missing "title" field', function() {
+      const updateNote = {
+        content: 'This is some text for my note'
+      };
+
+      return chai
+        .request(app)
+        .post('/api/notes')
+        .send(updateNote)
+        .then(function(res) {
+          expect(res).to.have.status(400);
+        });
+    });
   });
 
-  describe.skip('DELETE  /api/notes/:id', function() {
-    it('should delete an item by id', function() {});
+  describe('DELETE  /api/notes/:id', function() {
+    it('should delete an item by id', function() {
+      return chai
+        .request(app)
+        .get('/api/notes')
+        .then(function(res) {
+          return chai.request(app).delete(`/api/notes/${res.body[0].id}`);
+        })
+        .then(function(res) {
+          expect(res).to.have.status(204);
+        });
+    });
   });
 });
